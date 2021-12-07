@@ -1,6 +1,5 @@
 (ns aoc21.d7
-  (:require [clojure.string :as s]
-            [aoc21.core :as aoc :refer :all]))
+  (:require [aoc21.core :as aoc :refer :all]))
 
 (defn diff [a b] (if (< a b) (- b a) (- a b)))
 
@@ -14,19 +13,11 @@
                   (reduced min-fuel))))
             nil (range (first l) (inc (last l))))))
 
-(def sigma
- (memoize
-  (fn [n]
-    (if (zero? n) 0
-      (+ (sigma (dec n)) n)))))
-
 (def q1 (partial q0 identity))
-(def q2 (partial q0 sigma))
+(def q2 (partial q0 #(-> % (* (inc %)) (/ 2))))
 
 (def in (get-num))
-(def in2 [16,1,2,0,4,2,7,1,2,14])
 
-#_(q1 in2)
-#_(q2 in2)
 #_(q1 in)
 #_(q2 in)
+
