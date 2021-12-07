@@ -7,14 +7,12 @@
 (defn q0
   [fn-fuel l]
   (let [l (sort l)]
-    (loop [i (first l)
-           min-fuel nil]
-      (if (> i (last l))
-        min-fuel
-        (let [fuel (reduce #(-> (diff %2 i) fn-fuel (+ %1)) 0 l)]
-          (if (or (nil? min-fuel) (<= fuel min-fuel))
-            (recur (inc i) fuel)
-            min-fuel))))))
+    (reduce (fn [min-fuel i]
+              (let [fuel (reduce #(-> (diff %2 i) fn-fuel (+ %1)) 0 l)]
+                (if (or (nil? min-fuel) (<= fuel min-fuel))
+                  fuel
+                  (reduced min-fuel))))
+            nil (range (first l) (inc (last l))))))
 
 (def sigma
  (memoize
