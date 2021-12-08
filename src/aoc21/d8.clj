@@ -2,25 +2,28 @@
   (:require [aoc21.core :refer :all]
             [clojure.set :as set]))
 
+(defn get-code-fn
+  [digits]
+  (let [cnt= #(or (nil? %1) (= %1 (count %2)))
+        dset (set digits)]
+    (fn [curr-cnt & [diff-code diff-cnt]]
+      (some #(when (and (cnt= curr-cnt %)
+                        (cnt= diff-cnt (set/difference % diff-code)))
+               %) dset))))
+
 (defn calc [digits]
-  (let [digits (set digits)
-        c8 (some #(when (= 7 (count %)) %) digits)
-        c7 (some #(when (= 3 (count %)) %) digits)
-        c1 (some #(when (= 2 (count %)) %) digits)
-        c4 (some #(when (= 4 (count %)) %) digits)
-        c3 (some #(when (and (= 5 (count %))
-                             (= 3 (count (set/difference % c1)))) %) digits)
-        c6 (some #(when (and (= 6 (count %))
-                             (= 5 (count (set/difference % c1)))) %) digits)
-        c5 (some #(when (and (= 5 (count %))
-                             (= 0 (count (set/difference % c6)))) %) digits)
-        c0 (some #(when (and (= 6 (count %))
-                             (= 7 (count (set/union % c5)))) %) digits)
-        c9 (some #(when (and (= 6 (count %))
-                             (= 6 (count (set/union % c3)))) %) digits)
-        c2 (some #(when (and (= 5 (count %))
-                             (= 7 (count (set/union % c4)))) %) digits)]
-    {c0 0 c1 1 c2 2 c3 3 c4 4 c5 5 c6 6 c7 7 c8 8 c9 9}))
+  (let [get-code (get-code-fn digits)
+        c8 (get-code 7)
+        c7 (get-code 3)
+        c1 (get-code 2)
+        c4 (get-code 4)
+        c3 (get-code 5 c1 3)
+        c6 (get-code 6 c1 5)
+        c5 (get-code 5 c6 0)
+        c2 (get-code 5 c4 3)
+        c9 (get-code 6 c3 1)
+        c0 (get-code 6 c5 2)]
+    (zipmap [c0 c1 c2 c3 c4 c5 c6 c7 c8 c9] (range))))
 
 (defn q1
   [l]
