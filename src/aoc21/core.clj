@@ -23,6 +23,14 @@
         (mapv (fn [l]
                 (s/split l (re-pattern delim)))))))
 
+(defn get-line-word
+  ([word]
+   (get-line-word (get-res) word))
+  ([s word]
+   (->> (s/split s #"\n")
+        (mapv (fn [l]
+                (re-seq (re-pattern word) l))))))
+
 (defn atoi
   [s]
   (Integer. (str s)))
@@ -48,4 +56,15 @@
         (mapv (fn [l]
                 (->> (re-seq #"[+-]?\d+" l)
                      (mapv atoi)))))))
+
+(defn get-near-pts
+  [rows cols p & [diagonal?]]
+  (->> (repeat p)
+       (mapv (fn [[ar ac] [br bc]]
+               [(+ ar br) (+ ac bc)])
+             (cond-> [[-1 0] [0 -1] [0 1] [1 0]]
+               diagonal? (conj [-1 -1] [1 1] [-1 1] [1 -1])))
+       (filter (fn [[r c]]
+                 (and (>= r 0) (< r rows)
+                      (>= c 0) (< c cols))))))
 
