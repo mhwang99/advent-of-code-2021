@@ -58,13 +58,12 @@
                      (mapv atoi)))))))
 
 (defn get-near-pts
-  [rows cols p & [diagonal?]]
-  (->> (repeat p)
-       (mapv (fn [[ar ac] [br bc]]
-               [(+ ar br) (+ ac bc)])
-             (cond-> [[-1 0] [0 -1] [0 1] [1 0]]
-               diagonal? (conj [-1 -1] [1 1] [-1 1] [1 -1])))
-       (filter (fn [[r c]]
-                 (and (>= r 0) (< r rows)
-                      (>= c 0) (< c cols))))))
-
+  ([rows cols p]
+   (get-near-pts rows cols false p))
+  ([rows cols diagonal? p]
+   (->> (repeat p)
+        (mapv (fn [[ar ac] [br bc]]
+                [(+ ar br) (+ ac bc)])
+              (cond-> [[-1 0] [0 -1] [0 1] [1 0]]
+                diagonal? (conj [-1 -1] [1 1] [-1 1] [1 -1])))
+        (filter (fn [[r c]] (and (< -1 r rows) (< -1 c cols)))))))
