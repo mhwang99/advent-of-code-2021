@@ -2,11 +2,11 @@
   (:require [aoc21.core :refer :all]))
 
 (defn fold
-  [pts [axl line]]
-  (reduce (fn [acc [row col :as pt]]
+  [pts [axl p]]
+  (reduce (fn [acc [y x :as pt]]
             (let [pt (cond
-                       (and (= axl :x) (> col line)) [row (- (* 2 line) col)]
-                       (and (= axl :y) (> row line)) [(- (* 2 line) row) col]
+                       (and (= axl :x) (> x p)) [y (- (* 2 p) x)]
+                       (and (= axl :y) (> y p)) [(- (* 2 p) y) x]
                        :else pt)]
               (conj acc pt)))
           #{} pts))
@@ -28,7 +28,7 @@
 (defn parse [src]
   (let [res (get-line-word src "x|y|\\d+")
         pts (->> (take-while some? res)
-                 (mapv (fn [[c r]] [(atoi r) (atoi c)])))
+                 (mapv (fn [[x y]] [(atoi y) (atoi x)])))
         inst (->> (drop (inc(count pts)) res)
                   (mapv (fn [[axl p]]
                           [(keyword axl) (atoi p)])))]
