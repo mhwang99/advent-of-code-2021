@@ -25,21 +25,19 @@
   [ll n]
   (let [rows (count ll)
         cols (-> ll first count)]
-    (reduce (fn [nll irow]
-              (reduce (fn [nll row]
-                        (reduce (fn [nll icol]
-                                  (reduce (fn [nll col]
-                                            (assoc-in nll
-                                                      [(+ (* irow rows) row)
-                                                       (+ (* icol cols) col)]
-                                                      (-> (get-in ll [row col])
-                                                          (+ icol irow -1)
-                                                          (mod 9) inc)))
-                                          nll (range cols)))
-                                nll (range n)))
-                      nll (range rows)))
+    (reduce (fn [board [i j r c]]
+              (assoc-in board
+                        [(+ (* i rows) r)
+                         (+ (* j cols) c)]
+                        (-> (get-in ll [r c])
+                            (+ i j -1)
+                            (mod 9) inc)))
             (vec (repeat (* n rows) (vec (repeat (* n cols) 0))))
-            (range n))))
+            (for [i (range n)
+                  j (range n)
+                  r (range rows)
+                  c (range cols)]
+              [i j r c]))))
 
 (defn q1 [ll]
   (-> (get-added-risk ll) last last))
