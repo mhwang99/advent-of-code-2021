@@ -67,3 +67,11 @@
               (cond-> [[-1 0] [0 -1] [0 1] [1 0]]
                 diagonal? (conj [-1 -1] [1 1] [-1 1] [1 -1])))
         (filter (fn [[r c]] (and (< -1 r rows) (< -1 c cols)))))))
+
+(defn reduce-walk
+  [f acc form]
+  (let [pf (partial reduce-walk f)]
+    (if (coll? form)
+      (f (reduce pf acc form) form)
+      (f acc form))))
+
