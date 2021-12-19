@@ -21,7 +21,7 @@
                                     (<= min-y y max-y)) 1
                                (or (> x max-x) (< y min-y)) 0
                                :else (recur [(+ x vx) (+ y vy)
-                                             (max 0 (dec vx))
+                                             (if (= vx 0)  0 (dec vx))
                                              (dec vy)])))))
                       cnt (range svy (inc evy))))
             0 (range svx (inc evx)))))
