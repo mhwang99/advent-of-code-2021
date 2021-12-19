@@ -4,30 +4,41 @@
 (defn abs [i] (if (< i 0) (- 0 i) i))
 (defn max-reach [v] (/ (* v (inc v)) 2))
 
-(defn q1 [[min-x max-x min-y _]]
-  (if (->> (map max-reach (range (abs min-y)))
-           (some #(<= min-x % max-x)))
-    ;if not (x range is not easy to hit),then find other way
-    (-> min-y abs dec max-reach)))
+(defn hit? [vx vy [min-x max-x min-y max-y]]
+  (loop [[x y vx vy] [0 0 vx vy]]
+    (cond
+      (and (<= min-x x max-x)
+           (<= min-y y max-y)) :hit
+      (or (> x max-x) (< y min-y)) nil
+      :else (recur [(+ x vx) (+ y vy)
+                    (if (= vx 0)  0 (dec vx))
+                    (dec vy)]))))
 
-(defn q2 [[min-x max-x min-y max-y]]
+(defn q1 [[min-x max-x min-y max-y :as src]]
   (let [svx (loop [i 1] (if (>= (max-reach i) min-x) i (recur (inc i))))
         evx max-x
         svy min-y
         evy (-> min-y abs dec)]
-    (reduce (fn [cnt vx]
-              (reduce (fn [cnt vy]
-                        (+ cnt
-                           (loop [[x y vx vy] [0 0 vx vy]]
-                             (cond
-                               (and (<= min-x x max-x)
-                                    (<= min-y y max-y)) 1
-                               (or (> x max-x) (< y min-y)) 0
-                               :else (recur [(+ x vx) (+ y vy)
-                                             (if (= vx 0)  0 (dec vx))
-                                             (dec vy)])))))
-                      cnt (range svy (inc evy))))
-            0 (range svx (inc evx)))))
+    (max-reach
+      (some (fn [vy]
+              (some (fn [vx]
+                      (when (hit? vx vy src)
+                        vy))
+                    (range svx (inc evx))))
+            (reverse (range svy (inc evy)))))))
+
+(defn q2 [[min-x max-x min-y max-y :as src]]
+  (let [svx (loop [i 1] (if (>= (max-reach i) min-x) i (recur (inc i))))
+        evx max-x
+        svy min-y
+        evy (-> min-y abs dec)]
+    (reduce (fn [cnt vy]
+              (reduce (fn [cnt vx]
+                        (if (hit? vx vy src)
+                          (inc cnt)
+                          cnt))
+                      cnt (range svx (inc evx))))
+            0 (range svy (inc evy)))))
 
 (def in (get-num (get-res) true))
 
