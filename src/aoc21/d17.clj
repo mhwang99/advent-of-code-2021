@@ -4,8 +4,11 @@
 (defn abs [i] (if (< i 0) (- 0 i) i))
 (defn max-reach [v] (/ (* v (inc v)) 2))
 
-(defn q1 [[_ _ min-y _]]
-  (-> min-y abs dec max-reach))
+(defn q1 [[min-x max-x min-y _]]
+  (if (->> (map max-reach (range (abs min-y)))
+           (some #(<= min-x % max-x)))
+    ;if not (x range is not easy to hit),then find other way
+    (-> min-y abs dec max-reach)))
 
 (defn q2 [[min-x max-x min-y max-y]]
   (let [svx (loop [i 1] (if (>= (max-reach i) min-x) i (recur (inc i))))
