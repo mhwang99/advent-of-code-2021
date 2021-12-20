@@ -17,18 +17,14 @@
    (+ (* fy (get pt y)) dy)
    (+ (* fz (get pt z)) dz)])
 
-(defn deploy-rule [rule pt]
-  (deploy-convert (into [0 0 0] rule) pt))
-
-(defn mix-xyz [pt]
-  (mapv (fn [rule] [(deploy-rule rule pt) rule])
-        mix-rules))
+(defn deploy-rule [[x y z fx fy fz] pt]
+  [(* fx (get pt x)) (* fy (get pt y)) (* fz (get pt z))])
 
 (defn get-all-distance [a b]
-  (map (fn [a [b rule]]
-         (into (mapv - a b) rule))
+  (map (fn [a rule]
+         (into (mapv - a (deploy-rule rule b)) rule))
        (repeat a)
-       (mix-xyz b)))
+       mix-rules))
 
 (defn get-overlap [scan-a scan-b]
   (->> (for [a scan-a b scan-b]
@@ -54,11 +50,9 @@
                                  (mapv #(deploy-convert convert %))
                                  (into v1)
                                  (assoc (dissoc m k2) k1))
-                            (let [scanners (get scm k2)
-                                  scm (apply dissoc scm (keys scanners))]
-                              (->> scanners
-                                   (map (fn [[k v]] [k (deploy-convert convert v)]))
-                                   (update scm k1 into)))]
+                            (->> (get scm k2)
+                                 (map (fn [[k v]] [k (deploy-convert convert v)]))
+                                 (update (dissoc scm k2) k1 into))]
                            acc) acc) acc))
                    [m scm])
            recur))))
@@ -66,10 +60,9 @@
 (defn q1 [m]
   (-> m q0 first first second count))
 
-(defn abs [i] (if (< i 0) (- 0 i) i))
-
 (defn q2 [m]
-    (let [scanners (-> m q0 second (get 0) vals)]
+    (let [abs (fn [i] (if (< i 0) (- 0 i) i))
+          scanners (-> m q0 second (get 0) vals)]
       (->> (for [a scanners
                  b scanners
                  :when (pos? (compare a b))]
@@ -77,7 +70,6 @@
            (map (fn [[a b]]
                   (apply + (map #(abs (- %1 %2)) a b))))
            (reduce max))))
-
 
 (defn parse-input [res]
   (loop [src (get-line-num res)
