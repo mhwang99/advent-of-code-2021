@@ -9,7 +9,12 @@
         fx [-1 1]
         fy [-1 1]
         fz [-1 1]
-        :when (and (not= x y) (not= x z) (not= y z))]
+        :when (let [f (if (or (= y (inc x))
+                              (= z (inc y))
+                              (= x (inc z)))
+                        1 -1)]
+                (and (not= x y) (not= x z) (not= y z)
+                     (= (* f fx fy fz) 1)))]
     [x y z fx fy fz]))
 
 (defn deploy-convert [[dx dy dz x y z fx fy fz] pt]
@@ -58,7 +63,7 @@
            recur))))
 
 (defn q1 [m]
-  (-> m q0 first first second count))
+  (-> m q0 first (get 0) count))
 
 (defn q2 [m]
     (let [abs (fn [i] (if (< i 0) (- 0 i) i))
