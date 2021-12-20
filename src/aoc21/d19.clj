@@ -72,17 +72,13 @@
            (reduce max))))
 
 (defn parse-input [res]
-  (loop [src (get-line-num res)
-         ret []]
-    (if (seq src)
-      (let [l (take-while seq src)]
-        (recur (drop (inc (count l)) src)
-               (conj ret [(ffirst l) (set (rest l))])))
-      (into {} ret))))
+  (->> (get-line-num res)
+       (partition-by empty?)
+       (take-nth 2)
+       (mapv (fn [l] [(ffirst l) (set (rest l))]))
+       (into {})))
 
 (def in (parse-input (get-res)))
 
 #_(q1 in)
 #_(q2 in)
-
-
